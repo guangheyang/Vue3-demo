@@ -12,7 +12,7 @@
           @keyup.enter="addTodo"
         />
       </header>
-      <section class="main">
+      <section v-show="todosRef.length > 0" class="main">
         <input id="toggle-all" class="toggle-all" type="checkbox" v-model="allDoneRef" />
         <label for="toggle-all">Mark all as complete</label>
         <ul class="todo-list">
@@ -28,14 +28,14 @@
             <div class="view">
               <input class="toggle" type="checkbox" v-model="todo.completed" />
               <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
-              <button class="destroy"></button>
+              <button class="destroy" @click="deleteTodo(todo)"></button>
             </div>
             <input
               class="edit"
               type="text"
               v-model="todo.title"
-              @blur="doneEdit"
-              @keyup.enter="doneEdit"
+              @blur="doneEdit(todo)"
+              @keyup.enter="doneEdit(todo)"
               @keyup.escape="cancelEdit(todo)"
             />
           </li>
@@ -57,7 +57,7 @@
           </li> -->
         </ul>
       </section>
-      <footer class="footer">
+      <footer v-show="todosRef.length > 0" class="footer">
         <span class="todo-count">
           <strong>{{ remainingRef }}</strong>
           <span>item{{ remainingRef <= 1 ? "" : "s" }} left</span>
@@ -81,7 +81,7 @@
             >
           </li>
         </ul>
-        <button v-show="completedRef > 0" class="clear-completed">
+        <button v-show="completedRef > 0" class="clear-completed" @click="clearCompleted">
           Clear completed
         </button>
       </footer>
@@ -93,13 +93,16 @@ import useTodoList from "./composition/useTodoList";
 import useNewTodo from "./composition/useNewTodo";
 import useFilter from "./composition/useFilter";
 import useEditTodo from "./composition/useEditTodo";
+import useDeleteTodo from './composition/useDeleteTodo';
 export default {
   setup() {
     const { todosRef } = useTodoList();
     return {
+      todosRef,
       ...useNewTodo(todosRef),
       ...useFilter(todosRef),
       ...useEditTodo(todosRef),
+      ...useDeleteTodo(todosRef)
     };
   },
 };
