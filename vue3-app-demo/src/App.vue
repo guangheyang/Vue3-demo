@@ -13,16 +13,31 @@
         />
       </header>
       <section class="main">
-        <input id="toggle-all" class="toggle-all" type="checkbox" />
+        <input id="toggle-all" class="toggle-all" type="checkbox" v-model="allDoneRef" />
         <label for="toggle-all">Mark all as complete</label>
         <ul class="todo-list">
-          <li class="todo" :class="{ completed: todo.completed }" v-for="todo in filterdTodosRef" :key="todo.id">
+          <li
+            class="todo"
+            :class="{
+              completed: todo.completed,
+              editing: todo === editingTodoRef,
+            }"
+            v-for="todo in filterdTodosRef"
+            :key="todo.id"
+          >
             <div class="view">
               <input class="toggle" type="checkbox" v-model="todo.completed" />
-              <label>{{ todo.title }}</label>
+              <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
               <button class="destroy"></button>
             </div>
-            <input class="edit" type="text" />
+            <input
+              class="edit"
+              type="text"
+              v-model="todo.title"
+              @blur="doneEdit"
+              @keyup.enter="doneEdit"
+              @keyup.escape="cancelEdit(todo)"
+            />
           </li>
           <!-- <li class="todo">
             <div class="view">
@@ -45,12 +60,26 @@
       <footer class="footer">
         <span class="todo-count">
           <strong>{{ remainingRef }}</strong>
-          <span>item{{ remainingRef === 1 ? '' : 's' }} left</span>
+          <span>item{{ remainingRef <= 1 ? "" : "s" }} left</span>
         </span>
         <ul class="filters">
-          <li><a href="#/all" :class="{ selected: visibilityRef === 'all' }">All</a></li>
-          <li><a href="#/active" :class="{ selected: visibilityRef === 'active' }">Active</a></li>
-          <li><a href="#/completed" :class="{ selected: visibilityRef === 'completed' }">Completed</a></li>
+          <li>
+            <a href="#/all" :class="{ selected: visibilityRef === 'all' }"
+              >All</a
+            >
+          </li>
+          <li>
+            <a href="#/active" :class="{ selected: visibilityRef === 'active' }"
+              >Active</a
+            >
+          </li>
+          <li>
+            <a
+              href="#/completed"
+              :class="{ selected: visibilityRef === 'completed' }"
+              >Completed</a
+            >
+          </li>
         </ul>
         <button v-show="completedRef > 0" class="clear-completed">
           Clear completed
@@ -60,16 +89,18 @@
   </div>
 </template>
 <script>
-import useTodoList from './composition/useTodoList'
-import useNewTodo from './composition/useNewTodo'
-import useFilter from './composition/useFilter'
+import useTodoList from "./composition/useTodoList";
+import useNewTodo from "./composition/useNewTodo";
+import useFilter from "./composition/useFilter";
+import useEditTodo from "./composition/useEditTodo";
 export default {
   setup() {
-   const { todosRef } = useTodoList()
+    const { todosRef } = useTodoList();
     return {
       ...useNewTodo(todosRef),
-      ...useFilter(todosRef)
-    }
-  }
+      ...useFilter(todosRef),
+      ...useEditTodo(todosRef),
+    };
+  },
 };
 </script>
