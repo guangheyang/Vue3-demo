@@ -1,109 +1,77 @@
 <template>
   <div id="app">
-    <section class="todoapp">
-      <header class="header">
-        <h1>todos</h1>
-        <input
-          class="new-todo"
-          autofocus=""
-          autocomplete="off"
-          placeholder="What needs to be done?"
-          v-model="newTodoRef"
-          @keyup.enter="addTodo"
-        />
-      </header>
-      <section v-show="todosRef.length > 0" class="main">
-        <input id="toggle-all" class="toggle-all" type="checkbox" v-model="allDoneRef" />
-        <label for="toggle-all">Mark all as complete</label>
-        <ul class="todo-list">
-          <li
-            class="todo"
-            :class="{
-              completed: todo.completed,
-              editing: todo === editingTodoRef,
-            }"
-            v-for="todo in filterdTodosRef"
-            :key="todo.id"
-          >
-            <div class="view">
-              <input class="toggle" type="checkbox" v-model="todo.completed" />
-              <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
-              <button class="destroy" @click="deleteTodo(todo)"></button>
-            </div>
-            <input
-              class="edit"
-              type="text"
-              v-model="todo.title"
-              @blur="doneEdit(todo)"
-              @keyup.enter="doneEdit(todo)"
-              @keyup.escape="cancelEdit(todo)"
-            />
-          </li>
-          <!-- <li class="todo">
-            <div class="view">
-              <input class="toggle" type="checkbox" />
-              <label>投递50封简历</label>
-              <button class="destroy"></button>
-            </div>
-            <input class="edit" type="text" />
-          </li>
-          <li class="todo">
-            <div class="view">
-              <input class="toggle" type="checkbox" />
-              <label>上午10:30 参加面试</label>
-              <button class="destroy"></button>
-            </div>
-            <input class="edit" type="text" />
-          </li> -->
-        </ul>
-      </section>
-      <footer v-show="todosRef.length > 0" class="footer">
-        <span class="todo-count">
-          <strong>{{ remainingRef }}</strong>
-          <span>item{{ remainingRef <= 1 ? "" : "s" }} left</span>
-        </span>
-        <ul class="filters">
-          <li>
-            <a href="#/all" :class="{ selected: visibilityRef === 'all' }"
-              >All</a
-            >
-          </li>
-          <li>
-            <a href="#/active" :class="{ selected: visibilityRef === 'active' }"
-              >Active</a
-            >
-          </li>
-          <li>
-            <a
-              href="#/completed"
-              :class="{ selected: visibilityRef === 'completed' }"
-              >Completed</a
-            >
-          </li>
-        </ul>
-        <button v-show="completedRef > 0" class="clear-completed" @click="clearCompleted">
-          Clear completed
-        </button>
-      </footer>
-    </section>
+    <div class="container">
+      <div class="list">
+        <strong>编辑：</strong>
+        <div class="list">
+          <!-- <CheckEditor :modelValue="checked" @update:modelValue="checked = $event"></CheckEditor> -->
+          <CheckEditor
+            v-for="item in products"
+            :key="item.id"
+            v-model="item.sell"
+            v-model:title.trim="item.title"
+          />
+        </div>
+      </div>
+      <div class="list">
+        <strong>销售中:</strong>
+        <div>
+          <template v-for="(item, index) in sells" :key="item.id">
+            <span>{{ index + 1 }}.</span>
+            <strong>{{ item.title }}</strong>
+          </template>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
-import useTodoList from "./composition/useTodoList";
-import useNewTodo from "./composition/useNewTodo";
-import useFilter from "./composition/useFilter";
-import useEditTodo from "./composition/useEditTodo";
-import useDeleteTodo from './composition/useDeleteTodo';
+import { ref, computed } from "vue";
+const tasksRef = [
+  {
+    id: 1,
+    sell: true,
+    title: "iphone12",
+  },
+  { id: 2, sell: false, title: "xiaomi" },
+  { id: 3, sell: true, title: "huawei" },
+  { id: 4, sell: true, title: "vivo" },
+];
+import CheckEditor from "./components/CheckEditor.vue";
 export default {
   setup() {
-    const { todosRef } = useTodoList();
+    const productsRef = ref(tasksRef);
+    const sellsRef = computed(() => productsRef.value.filter(it => it.sell))
     return {
-      todosRef,
-      ...useNewTodo(todosRef),
-      ...useFilter(todosRef),
-      ...useEditTodo(todosRef),
-      ...useDeleteTodo(todosRef)
+      products: productsRef,
+      sells: sellsRef
+    };
+  },
+  components: {
+    CheckEditor,
+  },
+  data() {
+    return {
+      checked: true,
+      title: "xiaomi",
     };
   },
 };
 </script>
+<style>
+.container {
+  margin-top: 50px;
+  width: 880px;
+  margin: 50px auto;
+}
+
+.list {
+  display: flex;
+  margin: 1em 0;
+  align-items: center;
+}
+
+strong {
+  margin-right: 1em;
+}
+</style>

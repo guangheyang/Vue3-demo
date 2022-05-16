@@ -1,86 +1,62 @@
-## vue3与vue2的不同
+# v-model
 
-1. vue3不存在构造函数Vue，vue3与vue2之间的的迭代称之为breaking（截断式更新）
+`vue2`比较让人诟病的一点就是提供了两种双向绑定：`v-model`和`.sync`，在`vue3`中，去掉了`.sync`修饰符，只需要使用`v-model`进行双向绑定即可。
 
-   ```JS
-   // vue2 的 main.js
-   import Vue from 'vue'
-   import App from './App,vue'
-   const app = new Vue(options)
-   Vue.use(...)
-   app.$mount('#app')
-   ```
+为了让`v-model`更好的针对多个属性进行双向绑定，`vue3`作出了以下修改
 
-   ```js
-   // vue3 的 main.js
-   import { createApp } from 'vue' //使用具名导入的方式
-   import App from './App,vue'
-   const app = createApp(App)
-   Vue.use(...)
-   app.mount('#app')
-   ```
+- 当对自定义组件使用`v-model`指令时，绑定的属性名由原来的`value`变为`modelValue`，事件名由原来的`input`变为`update:modelValue`
 
-   
+  ```
+  <!-- vue2 -->
+  <ChildComponent :value="pageTitle" @input="pageTitle = $event" />
+  <!-- 简写为 -->
+  <ChildComponent v-model="pageTitle" />
+  
+  <!-- vue3 -->
+  <ChildComponent
+    :modelValue="pageTitle"
+    @update:modelValue="pageTitle = $event"
+  />
+  <!-- 简写为 -->
+  <ChildComponent v-model="pageTitle" />
+  ```
 
-2. vue3对组件实例进行代理处理
+- 去掉了`.sync`修饰符，它原本的功能由`v-model`的参数替代
 
-   vue2访问某一属性，直接获取组件实例的属性值并返回
+  ```
+  <!-- vue2 -->
+  <ChildComponent :title="pageTitle" @update:title="pageTitle = $event" />
+  <!-- 简写为 -->
+  <ChildComponent :title.sync="pageTitle" />
+  
+  <!-- vue3 -->
+  <ChildComponent :title="pageTitle" @update:title="pageTitle = $event" />
+  <!-- 简写为 -->
+  <ChildComponent v-model:title="pageTitle" />
+  ```
 
-   vue3访问某一属性，要先访问这个组件实例的代理对象，通过这个组件的代理对象去访问组件实例上间接获取这一属性，
+- `model`配置被移除
 
-   **访问this属性不在返回组件实例而是返回组件的代理对象**
+- 允许自定义`v-model`修饰符
 
-   
+  vue2 无此功能
 
-3. vue3 的 composttion api 与 vue2 的option api
+  ![image-20201008163021918](https://camo.githubusercontent.com/216697fc3cd13be5fede2b53e45f0fd1fba8ce9b0add09ed09a3324f53bc0ef6/687474703a2f2f6d6472732e7975616e6a696e2e746563682f696d672f32303230313030383136333032322e706e67)
 
-   ```vue
-   // vue2
-   <template>
-   	<button	@click="increase">count: {{ count }}</button>
-   </template>
-   <script>
-   export default {
-     data() {
-       return {
-         count: 0
-       }
-     },
-     methods: {
-       increase() {
-         this.count = this.count++
-       }
-     }
-   }
-   </script>
-   ```
+# v-if v-for
 
-   ```vue
-   // vue3
-   <template>
-   	<button	@click="increase">count: {{ count }}</button>
-   </template>
-   <script>
-   import { ref } from 'vue' // 实现响应式
-   export default {
-     setup() {
-       console.log("在所有生命周期钩子函数之前调用")
-       console.log(this) // this -> undefined
-       let countRef = ref(0)
-       const increase = () => {
-           countRef.value++
-           console.log(countRef, 'increase')
-       }
-       return {
-           increase,
-           count
-       }
-     }
-   }
-   </script>
-   ```
+```
+v-if` 的优先级 现在高于 `v-for
+```
 
-   **对ref的特殊处理**访问count时通过代理对象访问组件实例的count.value，在setup中是一个对象，在实例代理中是count.value
+# key
 
-4. 可以存在多个根节点
+- 当使用`进行`v-for`循环时，需要把`key`值放到`中，而不是它的子元素中
 
+- 当使用`v-if v-else-if v-else`分支的时候，不再需要指定`key`值，因为`vue3`会自动给予每个分支一个唯一的`key`
+
+  即便要手工给予`key`值，也必须给予每个分支唯一的`key`，**不能因为要重用分支而给予相同的 key**
+
+# Fragment
+
+`vue3`现在允许组件出现多个根节点
