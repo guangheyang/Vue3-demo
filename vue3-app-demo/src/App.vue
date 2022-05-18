@@ -1,77 +1,30 @@
 <template>
-  <div id="app">
-    <div class="container">
-      <div class="list">
-        <strong>编辑：</strong>
-        <div class="list">
-          <!-- <CheckEditor :modelValue="checked" @update:modelValue="checked = $event"></CheckEditor> -->
-          <CheckEditor
-            v-for="item in products"
-            :key="item.id"
-            v-model="item.sell"
-            v-model:title.trim="item.title"
-          />
-        </div>
-      </div>
-      <div class="list">
-        <strong>销售中:</strong>
-        <div>
-          <template v-for="(item, index) in sells" :key="item.id">
-            <span>{{ index + 1 }}.</span>
-            <strong>{{ item.title }}</strong>
-          </template>
-        </div>
-      </div>
-    </div>
+  <div id="nav">
+    <router-link to="/" class="router-link-exact-active" >Home</router-link>
+    |
+    <router-link to="/about">About</router-link>
   </div>
+  <router-view></router-view>
 </template>
-<script>
-import { ref, computed } from "vue";
-const tasksRef = [
-  {
-    id: 1,
-    sell: true,
-    title: "iphone12",
-  },
-  { id: 2, sell: false, title: "xiaomi" },
-  { id: 3, sell: true, title: "huawei" },
-  { id: 4, sell: true, title: "vivo" },
-];
-import CheckEditor from "./components/CheckEditor.vue";
-export default {
-  setup() {
-    const productsRef = ref(tasksRef);
-    const sellsRef = computed(() => productsRef.value.filter(it => it.sell))
-    return {
-      products: productsRef,
-      sells: sellsRef
-    };
-  },
-  components: {
-    CheckEditor,
-  },
-  data() {
-    return {
-      checked: true,
-      title: "xiaomi",
-    };
-  },
-};
-</script>
+
 <style>
-.container {
-  margin-top: 50px;
-  width: 880px;
-  margin: 50px auto;
-}
+  body {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
+  #nav {
+    padding: 30px;
+  }
 
-.list {
-  display: flex;
-  margin: 1em 0;
-  align-items: center;
-}
+  #nav a {
+    font-weight: bold;
+    color: #2c3e50;
+  }
 
-strong {
-  margin-right: 1em;
-}
+  #nav a.router-link-exact-active {
+    color: #42b983;
+  }
 </style>
