@@ -17,26 +17,39 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { login, loginUserStore } from '../store/loginUser'
+import { useStore } from "../store/loginUser"
 export default {
   setup() {
-    const loginId = ref('')
-    const loginPwd = ref('')
-    const router = useRouter()
+    // const loginId = ref('')
+    // const loginPwd = ref('')
+    // const router = useRouter()
+    // const store = useStore()
+    // const handleSubmit = async () => {
+    //   await store.login(loginId.value, loginPwd.value)
+    //   if (store.state.user) {
+    //     router.push('/')
+    //   } else {
+    //     alert('账户/密码错误')
+    //   }
+    // }
+    const loginId = ref("");
+    const loginPwd = ref("");
+    const router = useRouter();
+    const store = useStore();
     const handleSubmit = async () => {
-      await login(loginId.value, loginPwd.value)
-      console.log(loginUserStore.loginUser)
-      if (loginUserStore.user) {
-        router.push('/')
+      await store.login(loginId.value, loginPwd.value);
+      console.log(store, 'store')
+      if (store.state.user) {
+        router.push("/");
       } else {
-        alert('账户/密码错误')
+        alert("账号密码错误");
       }
-    }
+    };
     return {
       loginId,
       loginPwd,
-      loginUserStore,
-      handleSubmit
+      handleSubmit,
+      loginUserStore: store.state
     }
   }
 }

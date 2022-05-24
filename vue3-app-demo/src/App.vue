@@ -2,9 +2,9 @@
   <div id="nav">
     <router-link to="/">Home</router-link>
     |
-    <span v-if="loginUserStore.loading">loading...</span>
-    <template v-else-if="loginUserStore.user">
-      <span>{{ loginUserStore.user.name }}</span>
+    <span v-if="state.loading">loading...</span>
+    <template v-else-if="state.user">
+      <span>{{ state.user.name }}</span>
       <a class="ml-5" href="" @click.prevent="handleLoginOut">退出</a>
     </template>
     <router-link v-else to="/login">Login</router-link>
@@ -13,18 +13,21 @@
 </template>
 <script>
 import { useRouter } from "vue-router";
-import { loginOut, loginUserStore } from './store/loginUser'
+import { useStore } from './store/loginUser'
 export default {
   setup() {
     const router = useRouter();
+    const store = useStore();
+    console.log(useStore, 'store')
+    store.whoAmI();
     const handleLoginOut = async () => {
-      await loginOut();
+      await store.loginOut();
       router.push("/login");
     };
     return {
-      loginUserStore,
-      handleLoginOut
-    }
+      ...store,
+      handleLoginOut,
+    };
   }
 };
 </script>

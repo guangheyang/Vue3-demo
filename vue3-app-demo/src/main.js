@@ -1,7 +1,8 @@
 import { createApp } from "vue";
 import router from './router';
 import App from "./App.vue";
-import { whoAmI } from './store/loginUser'
+import provideStore from './store'
 
-createApp(App).use(router).mount("#app");
-whoAmI()
+const app = createApp(App).use(router);
+provideStore(app)
+app.mount('#app')
