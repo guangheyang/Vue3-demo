@@ -16,20 +16,17 @@
 </template>
 <script>
 import { ref } from 'vue'
-import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { login, loginUserStore } from '../store/loginUser'
 export default {
   setup() {
     const loginId = ref('')
     const loginPwd = ref('')
-    const store = useStore()
     const router = useRouter()
     const handleSubmit = async () => {
-      const user = await store.dispatch('loginUser/login', {
-        loginId: loginId.value,
-        loginPwd: loginPwd.value,
-      })
-      if (user) {
+      await login(loginId.value, loginPwd.value)
+      console.log(loginUserStore.loginUser)
+      if (loginUserStore.user) {
         router.push('/')
       } else {
         alert('账户/密码错误')
@@ -38,6 +35,7 @@ export default {
     return {
       loginId,
       loginPwd,
+      loginUserStore,
       handleSubmit
     }
   }
